@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -17,7 +15,10 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Business Directory Indonesia by Optisio",
+  title: {
+    default: "Business Directory Indonesia by Optisio",
+    template: "%s | Business Directory Indonesia",
+  },
   description:
     "Direktori bisnis profesional untuk menemukan dan mempromosikan bisnis terbaik di Indonesia.",
 };
@@ -30,11 +31,9 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        {children}
       </body>
     </html>
   );

@@ -2,11 +2,11 @@ import Link from "next/link";
 import { ArrowRight, Mail } from "lucide-react";
 
 const TOP_CATEGORIES = [
-  { href: "/categories/teknologi-it", label: "Teknologi & IT" },
-  { href: "/categories/finansial", label: "Finansial" },
-  { href: "/categories/kesehatan", label: "Kesehatan" },
-  { href: "/categories/pendidikan", label: "Pendidikan" },
-  { href: "/categories/retail", label: "Retail & E-commerce" },
+  { href: "/category/teknologi-it", label: "Teknologi & IT" },
+  { href: "/category/finansial", label: "Finansial" },
+  { href: "/category/kesehatan", label: "Kesehatan" },
+  { href: "/category/pendidikan", label: "Pendidikan" },
+  { href: "/category/retail", label: "Retail & E-commerce" },
 ] as const;
 
 const QUICK_LINKS = [
@@ -21,7 +21,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative mt-auto overflow-hidden bg-[#070A12] text-slate-300">
+    <footer className="relative mt-auto overflow-hidden bg-[#070A12] pb-[calc(5.25rem+env(safe-area-inset-bottom))] text-slate-300 md:pb-0">
       {/* Atmosphere */}
       <div
         aria-hidden

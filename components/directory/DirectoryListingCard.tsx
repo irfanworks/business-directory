@@ -1,17 +1,55 @@
 import SafeImage from "@/components/ui/SafeImage";
 import Link from "next/link";
-import { ArrowUpRight, BadgeCheck, MapPin } from "lucide-react";
-import type { FeaturedListing } from "@/lib/types";
+import {
+  ArrowUpRight,
+  BadgeCheck,
+  MapPin,
+  Pin,
+} from "lucide-react";
+import {
+  isPriorityListing,
+  type DirectoryListing,
+} from "@/lib/types";
 
-type ListingCardProps = {
-  listing: FeaturedListing;
+type DirectoryListingCardProps = {
+  listing: DirectoryListing;
+  showSubcategory?: boolean;
 };
 
-export default function ListingCard({ listing }: ListingCardProps) {
+export default function DirectoryListingCard({
+  listing,
+  showSubcategory = true,
+}: DirectoryListingCardProps) {
+  const priority = isPriorityListing(listing);
+
   return (
-    <article className="group flex h-full flex-col rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.03)] transition duration-300 hover:-translate-y-0.5 hover:border-teal-200/80 hover:shadow-[0_12px_40px_-20px_rgba(15,23,42,0.18)]">
+    <article
+      className={`group relative flex h-full flex-col rounded-2xl bg-white p-5 transition duration-300 hover:-translate-y-0.5 ${
+        priority
+          ? "border border-amber-300/80 shadow-[0_1px_2px_rgba(180,83,9,0.06),0_0_0_1px_rgba(251,191,36,0.15),0_12px_32px_-18px_rgba(180,83,9,0.25)]"
+          : "border border-slate-200/80 shadow-[0_1px_2px_rgba(15,23,42,0.03)] hover:border-teal-200/80 hover:shadow-[0_12px_40px_-20px_rgba(15,23,42,0.18)]"
+      }`}
+    >
+      {priority && (
+        <div className="mb-3 flex flex-wrap items-center gap-1.5">
+          <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-50 to-yellow-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800 ring-1 ring-amber-200/80">
+            <Pin className="h-3 w-3" />
+            Featured
+          </span>
+          {listing.tier === "premium" && (
+            <span className="rounded-full border border-sky-200/90 bg-sky-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-sky-800">
+              Premium
+            </span>
+          )}
+        </div>
+      )}
+
       <div className="flex items-start gap-3.5">
-        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-slate-50">
+        <div
+          className={`relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-slate-50 ${
+            priority ? "border border-amber-200/80" : "border border-slate-100"
+          }`}
+        >
           {listing.logo_url ? (
             <SafeImage
               src={listing.logo_url}
@@ -48,14 +86,14 @@ export default function ListingCard({ listing }: ListingCardProps) {
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        {listing.tier === "premium" && (
+        {!priority && listing.tier === "premium" && (
           <span className="rounded-full border border-amber-200/80 bg-amber-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-amber-800">
             Premium
           </span>
         )}
-        {listing.category_name && (
+        {showSubcategory && listing.subcategory_name && (
           <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-600">
-            {listing.category_name}
+            {listing.subcategory_name}
           </span>
         )}
         {listing.city && (
@@ -69,7 +107,11 @@ export default function ListingCard({ listing }: ListingCardProps) {
       <div className="mt-auto pt-5">
         <Link
           href={`/business/${listing.slug}`}
-          className="inline-flex items-center gap-1 text-[13px] font-medium text-slate-950 transition group-hover:text-teal-700"
+          className={`inline-flex items-center gap-1 text-[13px] font-medium transition ${
+            priority
+              ? "text-amber-900 group-hover:text-amber-700"
+              : "text-slate-950 group-hover:text-teal-700"
+          }`}
         >
           View Profile
           <ArrowUpRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

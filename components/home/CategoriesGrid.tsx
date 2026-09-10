@@ -46,7 +46,7 @@ export default function CategoriesGrid({ categories }: CategoriesGridProps) {
                 }}
               >
                 <Link
-                  href={`/categories/${category.slug}`}
+                  href={`/category/${category.slug}`}
                   className="group flex h-full items-start gap-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 transition duration-300 hover:border-teal-200 hover:bg-white hover:shadow-[0_10px_30px_-18px_rgba(15,23,42,0.2)]"
                 >
                   <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200/80 bg-white text-teal-700 shadow-sm transition group-hover:border-teal-200 group-hover:text-teal-800">
