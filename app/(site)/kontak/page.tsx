@@ -92,7 +92,7 @@ export default async function KontakPage() {
             <li>
               Baca insight di{" "}
               <a
-                href="https://optisio.id/blog/"
+                href="https://optisio.com/blog/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 font-medium text-accent underline underline-offset-2"

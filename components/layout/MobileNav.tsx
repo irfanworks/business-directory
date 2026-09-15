@@ -3,14 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  ExternalLink,
   Home,
   Mail,
   Newspaper,
   PlusCircle,
 } from "lucide-react";
 
-const BLOG_URL = "https://optisio.id/blog/";
+const BLOG_URL = "https://optisio.com/blog/";
 
 const NAV_ITEMS = [
   {
@@ -69,17 +68,10 @@ export default function MobileNav() {
                       : "bg-transparent"
                   }`}
                 >
-                  {item.external ? (
-                    <ExternalLink
-                      className="h-[18px] w-[18px]"
-                      strokeWidth={2}
-                    />
-                  ) : (
-                    <Icon
-                      className="h-[18px] w-[18px]"
-                      strokeWidth={active ? 2.4 : 2}
-                    />
-                  )}
+                  <Icon
+                    className="h-[18px] w-[18px]"
+                    strokeWidth={active ? 2.4 : 2}
+                  />
                 </span>
                 <span
                   className={`truncate text-[11px] font-medium tracking-tight ${

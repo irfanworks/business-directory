@@ -14,7 +14,7 @@ const TOP_CATEGORIES = [
 const QUICK_LINKS = [
   { href: "/", label: "Home" },
   { href: "/submit", label: "Submit" },
-  { href: "https://optisio.id/blog/", label: "Blog", external: true },
+  { href: "https://optisio.com/blog/", label: "Blog", external: true },
   { href: "/kontak", label: "Kontak" },
 ] as const;
 
