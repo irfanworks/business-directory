@@ -27,6 +27,9 @@ function revalidateTaxonomy() {
   revalidatePath("/admin/listings");
   revalidatePath("/admin");
   revalidatePath("/");
+  revalidatePath("/sitemap.xml");
+  revalidatePath("/cari");
+  revalidatePath("/category", "layout");
 }
 
 export async function createCategory(input: {

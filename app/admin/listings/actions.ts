@@ -77,6 +77,8 @@ function revalidateListingPaths(slug?: string) {
   revalidatePath("/admin/listings");
   revalidatePath("/admin");
   revalidatePath("/");
+  revalidatePath("/sitemap.xml");
+  revalidatePath("/cari");
   if (slug) revalidatePath(`/business/${slug}`);
 }
 
