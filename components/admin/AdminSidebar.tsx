@@ -35,7 +35,7 @@ const NAV_ITEMS = [
   {
     href: "/admin/settings",
     label: "Site Settings",
-    description: "Banner, title, hero",
+    description: "Homepage, SEO & kontak",
     icon: Settings2,
   },
 ] as const;

@@ -32,9 +32,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: `${base}/category/teknologi-it`,
+      url: `${base}/submit`,
       lastModified: now,
-      changeFrequency: "weekly",
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${base}/kontak`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${base}/cari`,
+      lastModified: now,
+      changeFrequency: "daily",
       priority: 0.8,
     },
   ];

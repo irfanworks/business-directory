@@ -13,28 +13,25 @@ export default function EmptyState({
   categorySlug,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 px-6 py-16 text-center">
-      <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-400 shadow-sm">
+    <div className="flex flex-col items-center justify-center rounded-card border border-dashed border-border-strong bg-surface-soft/60 px-6 py-16 text-center">
+      <span className="inline-flex h-12 w-12 items-center justify-center rounded-card border border-border bg-white text-ink-500">
         <Building2 className="h-5 w-5" />
       </span>
-      <h3 className="mt-4 text-[16px] font-semibold tracking-tight text-slate-950">
+      <h3 className="mt-4 text-[16px] font-semibold tracking-tight text-ink-950">
         {title}
       </h3>
-      <p className="mt-2 max-w-sm text-[13px] leading-relaxed text-slate-500">
+      <p className="mt-2 max-w-sm text-[13px] leading-relaxed text-ink-500">
         {description}
       </p>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <Link
-          href="/submit"
-          className="inline-flex h-10 items-center gap-1.5 rounded-full bg-slate-950 px-4 text-[13px] font-medium text-white transition hover:bg-slate-800"
-        >
+        <Link href="/submit" className="btn-primary h-10 px-4">
           <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
-          Submit Business
+          Daftarkan bisnis
         </Link>
         {categorySlug && (
           <Link
             href={`/category/${categorySlug}`}
-            className="text-[13px] font-medium text-slate-600 transition hover:text-slate-950"
+            className="text-[13px] font-medium text-ink-700 transition hover:text-ink-950"
           >
             Lihat semua di kategori
           </Link>

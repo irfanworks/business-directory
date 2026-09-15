@@ -201,20 +201,13 @@ export default function ListingForm({
         <h2 className="text-[13px] font-semibold uppercase tracking-[0.1em] text-slate-500">
           Images
         </h2>
-        <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="mt-4">
           <ImageUploadField
             label="Logo"
             folder="logo"
             value={values.logo_url}
             onChange={(url) => patch("logo_url", url)}
-            hint="PNG/JPG, max 5MB"
-          />
-          <ImageUploadField
-            label="Banner"
-            folder="banner"
-            value={values.banner_url}
-            onChange={(url) => patch("banner_url", url)}
-            hint="Recommended 1600×480"
+            hint="PNG/JPG, max 5MB. Direkomendasikan 400×400."
           />
         </div>
       </section>
@@ -250,12 +243,16 @@ export default function ListingForm({
               className={inputClass}
             />
           </Field>
-          <Field label="Map iframe URL">
+          <Field
+            label="Google Maps / Business Profile URL"
+            className="md:col-span-2"
+            hint="Tempel link share dari Google Business Profile (maps.app.goo.gl, share.google, atau URL /maps/place/…). Embed memakai pin bisnis (CID/koordinat), bukan teks alamat. Bisa juga tempel HTML iframe dari Share → Embed a map."
+          >
             <input
-              value={values.map_iframe_url}
-              onChange={(e) => patch("map_iframe_url", e.target.value)}
+              value={values.maps_url}
+              onChange={(e) => patch("maps_url", e.target.value)}
               className={inputClass}
-              placeholder="https://www.google.com/maps/embed?…"
+              placeholder="https://maps.app.goo.gl/… atau https://share.google/…"
             />
           </Field>
           <Field label="Phone">
@@ -350,10 +347,12 @@ function Field({
   label,
   children,
   className = "",
+  hint,
 }: {
   label: string;
   children: React.ReactNode;
   className?: string;
+  hint?: string;
 }) {
   return (
     <label className={`block ${className}`}>
@@ -361,6 +360,11 @@ function Field({
         {label}
       </span>
       {children}
+      {hint ? (
+        <span className="mt-1.5 block text-[11px] leading-relaxed text-slate-500">
+          {hint}
+        </span>
+      ) : null}
     </label>
   );
 }

@@ -7,14 +7,14 @@ const FALLBACK_BUSINESSES: BusinessListing[] = [
     title: "Optisio Digital Solutions",
     slug: "optisio-digital-solutions",
     logo_url: "https://placehold.co/200x200/0f766e/ffffff?text=Optisio",
-    banner_url: "https://placehold.co/1600x480/134e4a/ffffff?text=Optisio+Banner",
     short_tagline: "Solusi digital profesional untuk bisnis Indonesia",
     content:
       "<h2>Tentang Optisio</h2><p>Optisio Digital Solutions adalah perusahaan teknologi yang membantu UMKM dan enterprise membangun kehadiran digital yang kuat.</p><h3>Sejarah</h3><p>Didirikan dengan visi menjadi mitra transformasi digital terpercaya di Indonesia.</p><h3>Layanan</h3><ul><li>Pengembangan web &amp; mobile</li><li>Product design &amp; UX</li><li>Digital strategy consulting</li></ul><h3>Keunggulan</h3><p>Tim berpengalaman, proses transparan, dan fokus pada hasil bisnis yang terukur.</p>",
     address: "Jl. Sudirman No. 123, Senayan",
     city: "Jakarta Selatan",
+    maps_url: "https://www.google.com/maps/search/?api=1&query=Jl.+Sudirman+No.+123,+Senayan,+Jakarta+Selatan",
     map_iframe_url:
-      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.3!2d106.8!3d-6.2!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMTInMDAuMCJTIDEwNsKwNDgnMDAuMCJF!5e0!3m2!1sen!2sid!4v1700000000000",
+      "https://www.google.com/maps?q=Jl.%20Sudirman%20No.%20123%2C%20Senayan%2C%20Jakarta%20Selatan&z=15&output=embed",
     phone: "+622112345678",
     whatsapp: "+6281234567890",
     email: "hello@optisio.id",
@@ -39,12 +39,12 @@ const FALLBACK_BUSINESSES: BusinessListing[] = [
     title: "Nusantara Code Studio",
     slug: "nusantara-code-studio",
     logo_url: "https://placehold.co/200x200/1e3a5f/ffffff?text=NCS",
-    banner_url: null,
     short_tagline: "Tim developer lokal untuk website & aplikasi UMKM",
     content:
       "<p>Nusantara Code Studio fokus membantu UMKM membangun website dan aplikasi sederhana dengan harga terjangkau.</p>",
     address: "Jl. Malioboro No. 45",
     city: "Yogyakarta",
+    maps_url: null,
     map_iframe_url: null,
     phone: "+622745551234",
     whatsapp: "+6285678901234",
@@ -77,11 +77,11 @@ function mapBusinessRow(row: {
   title: string;
   slug: string;
   logo_url: string | null;
-  banner_url: string | null;
   short_tagline: string | null;
   content: string | null;
   address: string | null;
   city: string | null;
+  maps_url: string | null;
   map_iframe_url: string | null;
   phone: string | null;
   whatsapp: string | null;
@@ -124,11 +124,11 @@ function mapBusinessRow(row: {
     title: row.title,
     slug: row.slug,
     logo_url: row.logo_url,
-    banner_url: row.banner_url,
     short_tagline: row.short_tagline,
     content: row.content,
     address: row.address,
     city: row.city,
+    maps_url: row.maps_url,
     map_iframe_url: row.map_iframe_url,
     phone: row.phone,
     whatsapp: row.whatsapp,
@@ -171,11 +171,11 @@ export async function getBusinessBySlug(
       title,
       slug,
       logo_url,
-      banner_url,
       short_tagline,
       content,
       address,
       city,
+      maps_url,
       map_iframe_url,
       phone,
       whatsapp,

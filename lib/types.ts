@@ -8,6 +8,8 @@ export type Category = {
   description: string | null;
   icon_name: string | null;
   listing_count?: number;
+  /** Preview of subcategories for homepage / discovery cards */
+  subcategories?: Pick<Subcategory, "id" | "name" | "slug">[];
 };
 
 export type FeaturedListing = {
@@ -22,6 +24,16 @@ export type FeaturedListing = {
   tier: ListingTier;
   category_name: string | null;
   category_slug: string | null;
+  subcategory_name?: string | null;
+  view_count?: number;
+  created_at?: string | null;
+  updated_at?: string | null;
+  whatsapp?: string | null;
+};
+
+export type LocationStat = {
+  city: string;
+  listing_count: number;
 };
 
 export type Subcategory = {
@@ -37,10 +49,16 @@ export type DirectoryListing = FeaturedListing & {
   subcategory_slug: string | null;
 };
 
+export type SortOption =
+  | "recommended"
+  | "relevant"
+  | "newest"
+  | "most_viewed";
+
 export type BusinessListing = DirectoryListing & {
-  banner_url: string | null;
   content: string | null;
   address: string | null;
+  maps_url: string | null;
   map_iframe_url: string | null;
   phone: string | null;
   whatsapp: string | null;

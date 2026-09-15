@@ -9,6 +9,7 @@ import {
 
 type PageProps = {
   params: { category_slug: string };
+  searchParams: { q?: string; city?: string; verified?: string };
 };
 
 export async function generateMetadata({
@@ -25,7 +26,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function CategoryPage({ params }: PageProps) {
+export default async function CategoryPage({ params, searchParams }: PageProps) {
   const category = await getCategoryBySlug(params.category_slug);
   if (!category) notFound();
 
@@ -44,6 +45,9 @@ export default async function CategoryPage({ params }: PageProps) {
         { label: "Home", href: "/" },
         { label: category.name },
       ]}
+      initialQuery={searchParams.q?.trim() ?? ""}
+      initialCity={searchParams.city?.trim() ?? ""}
+      initialVerified={searchParams.verified === "1"}
     />
   );
 }

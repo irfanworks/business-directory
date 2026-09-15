@@ -10,7 +10,7 @@ type ImageUploadFieldProps = {
   label: string;
   value: string;
   onChange: (url: string) => void;
-  folder?: "logo" | "banner";
+  folder?: "logo";
   hint?: string;
 };
 
@@ -86,9 +86,7 @@ export default function ImageUploadField({
 
       <div className="flex items-start gap-3">
         <div
-          className={`relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50 ${
-            folder === "banner" ? "h-20 w-36" : "h-16 w-16"
-          }`}
+          className="relative h-16 w-16 overflow-hidden rounded-xl border border-slate-200 bg-slate-50"
         >
           {value ? (
             <SafeImage

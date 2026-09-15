@@ -10,6 +10,7 @@ import {
 
 type PageProps = {
   params: { category_slug: string; subcategory_slug: string };
+  searchParams: { q?: string; city?: string; verified?: string };
 };
 
 export async function generateMetadata({
@@ -32,7 +33,10 @@ export async function generateMetadata({
   };
 }
 
-export default async function SubcategoryPage({ params }: PageProps) {
+export default async function SubcategoryPage({
+  params,
+  searchParams,
+}: PageProps) {
   const category = await getCategoryBySlug(params.category_slug);
   if (!category) notFound();
 
@@ -60,6 +64,9 @@ export default async function SubcategoryPage({ params }: PageProps) {
         { label: category.name, href: `/category/${category.slug}` },
         { label: subcategory.name },
       ]}
+      initialQuery={searchParams.q?.trim() ?? ""}
+      initialCity={searchParams.city?.trim() ?? ""}
+      initialVerified={searchParams.verified === "1"}
     />
   );
 }

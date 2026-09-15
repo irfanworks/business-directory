@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
 import AdminShell from "@/components/admin/AdminShell";
 import SettingsForm from "@/components/admin/settings/SettingsForm";
-import { getAdminSiteSettings } from "@/lib/data/admin-taxonomy";
+import { getSiteSettings } from "@/lib/data/site-settings";
 
 export const metadata: Metadata = {
   title: "Site Settings",
 };
 
 export default async function AdminSettingsPage() {
-  const settings = await getAdminSiteSettings();
+  const settings = await getSiteSettings();
 
   return (
     <AdminShell
       title="Site Settings"
-      description="Atur informasi global situs: nama, hero, kontak admin, dan social Optisio."
+      description="Atur konten homepage, identitas situs, kontak, social, dan SEO dasar."
       breadcrumb={[
         { label: "Admin", href: "/admin" },
         { label: "Site Settings" },

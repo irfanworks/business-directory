@@ -32,7 +32,15 @@ export async function saveSiteSettings(
   }));
 
   if (!rows.find((r) => r.key === "site_name")?.value) {
-    return { ok: false, error: "Site Name wajib diisi." };
+    return { ok: false, error: "Nama situs wajib diisi." };
+  }
+
+  if (!rows.find((r) => r.key === "seo_title")?.value) {
+    return { ok: false, error: "Meta title SEO wajib diisi." };
+  }
+
+  if (!rows.find((r) => r.key === "seo_description")?.value) {
+    return { ok: false, error: "Meta description SEO wajib diisi." };
   }
 
   const { error } = await supabase.from("site_settings").upsert(rows, {
@@ -45,5 +53,7 @@ export async function saveSiteSettings(
 
   revalidatePath("/admin/settings");
   revalidatePath("/");
+  revalidatePath("/kontak");
+  revalidatePath("/cari");
   return { ok: true };
 }

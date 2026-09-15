@@ -134,6 +134,9 @@ function mapListingRow(row: {
   verified_badge: boolean;
   is_featured: boolean;
   tier: DirectoryListing["tier"];
+  view_count?: number | null;
+  created_at?: string | null;
+  updated_at?: string | null;
   subcategories:
     | {
         name: string;
@@ -164,6 +167,9 @@ function mapListingRow(row: {
     category_slug: category?.slug ?? null,
     subcategory_name: subcategory?.name ?? null,
     subcategory_slug: subcategory?.slug ?? null,
+    view_count: row.view_count ?? undefined,
+    created_at: row.created_at ?? null,
+    updated_at: row.updated_at ?? null,
   };
 }
 
@@ -177,6 +183,9 @@ const LISTING_SELECT = `
   verified_badge,
   is_featured,
   tier,
+  view_count,
+  created_at,
+  updated_at,
   subcategories (
     name,
     slug,
@@ -326,4 +335,40 @@ export async function getPublishedListingsForSubcategoryId(
   }
 
   return sortListingsByPriority(data.map(mapListingRow));
+}
+
+export async function getAllPublishedListings(): Promise<DirectoryListing[]> {
+  if (!isSupabaseConfigured()) {
+    return sortListingsByPriority(FALLBACK_LISTINGS);
+  }
+
+  const supabase = createClient();
+  if (!supabase) {
+    return sortListingsByPriority(FALLBACK_LISTINGS);
+  }
+
+  const { data, error } = await supabase
+    .from("listings")
+    .select(LISTING_SELECT)
+    .eq("status", "published");
+
+  if (error || !data) {
+    console.error("Failed to load all listings:", error?.message);
+    return sortListingsByPriority(FALLBACK_LISTINGS);
+  }
+
+  return sortListingsByPriority(data.map(mapListingRow));
+}
+
+export async function getRelatedBusinesses(
+  categorySlug: string | null,
+  excludeId: string,
+  limit = 3,
+): Promise<DirectoryListing[]> {
+  if (!categorySlug) return [];
+
+  const listings = await getAllPublishedListings();
+  return listings
+    .filter((l) => l.category_slug === categorySlug && l.id !== excludeId)
+    .slice(0, limit);
 }

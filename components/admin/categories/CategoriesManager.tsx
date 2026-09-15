@@ -19,6 +19,7 @@ import {
   updateCategory,
   updateSubcategory,
 } from "@/app/admin/categories/actions";
+import IconNamePicker from "@/components/admin/categories/IconNamePicker";
 import { slugify } from "@/lib/admin/listings";
 import type { AdminCategory } from "@/lib/data/admin-taxonomy";
 
@@ -204,19 +205,17 @@ export default function CategoriesManager({
               className={inputClass}
             />
           </Field>
-          <Field label="Icon name">
-            <input
-              value={newCategory.icon_name}
-              onChange={(e) =>
-                setNewCategory((prev) => ({
-                  ...prev,
-                  icon_name: e.target.value,
-                }))
-              }
-              className={inputClass}
-              placeholder="cpu, landmark, briefcase…"
-            />
-          </Field>
+          <div className="md:col-span-2">
+            <Field label="Icon name">
+              <IconNamePicker
+                value={newCategory.icon_name}
+                onChange={(icon_name) =>
+                  setNewCategory((prev) => ({ ...prev, icon_name }))
+                }
+                disabled={isPending}
+              />
+            </Field>
+          </div>
           <Field label="Deskripsi">
             <input
               value={newCategory.description}
@@ -276,18 +275,17 @@ export default function CategoriesManager({
                       className={inputClass}
                     />
                   </Field>
-                  <Field label="Icon">
-                    <input
-                      value={categoryEdit.icon_name}
-                      onChange={(e) =>
-                        setCategoryEdit((prev) => ({
-                          ...prev,
-                          icon_name: e.target.value,
-                        }))
-                      }
-                      className={inputClass}
-                    />
-                  </Field>
+                  <div className="sm:col-span-2">
+                    <Field label="Icon">
+                      <IconNamePicker
+                        value={categoryEdit.icon_name}
+                        onChange={(icon_name) =>
+                          setCategoryEdit((prev) => ({ ...prev, icon_name }))
+                        }
+                        disabled={isPending}
+                      />
+                    </Field>
+                  </div>
                   <Field label="Deskripsi">
                     <input
                       value={categoryEdit.description}

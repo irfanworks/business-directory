@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { deleteListing } from "@/app/admin/listings/actions";
-import SafeImage from "@/components/ui/SafeImage";
+import BusinessLogo from "@/components/ui/BusinessLogo";
 import type { AdminListingTableRow } from "@/lib/admin/listings";
 
 type ListingsTableProps = {
@@ -119,21 +119,12 @@ export default function ListingsTable({ listings }: ListingsTableProps) {
                   className="border-b border-slate-100 last:border-0"
                 >
                   <td className="px-4 py-3">
-                    <div className="relative h-10 w-10 overflow-hidden rounded-lg border border-slate-100 bg-slate-50">
-                      {listing.logo_url ? (
-                        <SafeImage
-                          src={listing.logo_url}
-                          alt={`Logo ${listing.title}`}
-                          fill
-                          sizes="40px"
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-[12px] font-semibold text-slate-400">
-                          {listing.title.slice(0, 1)}
-                        </div>
-                      )}
-                    </div>
+                    <BusinessLogo
+                      name={listing.title}
+                      logoUrl={listing.logo_url}
+                      size="sm"
+                      className="rounded-lg border border-slate-100"
+                    />
                   </td>
                   <td className="px-4 py-3">
                     <div className="font-medium text-slate-900">

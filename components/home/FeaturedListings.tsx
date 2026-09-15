@@ -1,102 +1,147 @@
 "use client";
 
-import { useRef } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { motion, useInView } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import ListingCard from "@/components/home/ListingCard";
+import { motion } from "framer-motion";
+import ListingCard, {
+  ListingCardSkeleton,
+} from "@/components/home/ListingCard";
 import type { FeaturedListing } from "@/lib/types";
 
 type FeaturedListingsProps = {
   listings: FeaturedListing[];
+  isLoading?: boolean;
+  title?: string;
+  description?: string;
 };
 
-export default function FeaturedListings({ listings }: FeaturedListingsProps) {
-  const sectionRef = useRef<HTMLElement>(null);
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(sectionRef, { once: true, margin: "-80px" });
+type FilterId = "popular" | "verified" | "newest";
 
-  function scrollByCard(direction: -1 | 1) {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const amount = Math.min(el.clientWidth * 0.85, 360);
-    el.scrollBy({ left: direction * amount, behavior: "smooth" });
+const FILTERS: { id: FilterId; label: string }[] = [
+  { id: "popular", label: "Terpopuler" },
+  { id: "verified", label: "Terverifikasi" },
+  { id: "newest", label: "Baru Bergabung" },
+];
+
+function sortListings(listings: FeaturedListing[], filter: FilterId) {
+  const list = [...listings];
+  switch (filter) {
+    case "verified":
+      return list.sort(
+        (a, b) => Number(b.verified_badge) - Number(a.verified_badge),
+      );
+    case "newest":
+      return list.sort((a, b) => {
+        const aT = a.created_at ? Date.parse(a.created_at) : 0;
+        const bT = b.created_at ? Date.parse(b.created_at) : 0;
+        return bT - aT;
+      });
+    case "popular":
+    default:
+      return list.sort(
+        (a, b) => (b.view_count ?? 0) - (a.view_count ?? 0),
+      );
   }
+}
 
-  if (!listings.length) return null;
+export default function FeaturedListings({
+  listings,
+  isLoading = false,
+  title = "Sedang Trending",
+  description = "Bisnis yang sedang banyak dijelajahi di Optisio Directory.",
+}: FeaturedListingsProps) {
+  const [filter, setFilter] = useState<FilterId>("popular");
+  const sorted = useMemo(
+    () => sortListings(listings, filter),
+    [listings, filter],
+  );
+
+  if (!isLoading && !listings.length) return null;
+
+  const showCarouselControls = listings.length >= 6;
 
   return (
-    <section ref={sectionRef} className="py-16 sm:py-20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="flex items-end justify-between gap-4">
+    <section className="section-y bg-canvas">
+      <div className="container-site">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-[12px] font-medium uppercase tracking-[0.14em] text-teal-700">
-              Featured
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
-              Premium & featured businesses
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-60" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
+              </span>
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">
+                Live
+              </p>
+            </div>
+            <h2 className="mt-2 font-display text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
+              {title}
             </h2>
-            <p className="mt-2 max-w-lg text-[14px] text-slate-600">
-              Listing terverifikasi dengan eksposur prioritas di direktori.
+            <p className="mt-2 text-[15px] text-slate-500">
+              {description}
             </p>
           </div>
 
-          <div className="hidden items-center gap-2 sm:flex">
-            <button
-              type="button"
-              aria-label="Scroll left"
-              onClick={() => scrollByCard(-1)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:text-slate-950"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              aria-label="Scroll right"
-              onClick={() => scrollByCard(1)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:text-slate-950"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-            <Link
-              href="/directory?featured=1"
-              className="ml-2 text-[13px] font-medium text-slate-700 transition hover:text-teal-700"
-            >
-              View all
-            </Link>
-          </div>
+          <Link
+            href="/cari"
+            className="text-[13px] font-semibold text-gray-700 transition hover:text-gray-900"
+          >
+            Lihat Semua →
+          </Link>
         </div>
 
         <div
-          ref={scrollerRef}
-          className="mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 scrollbar-none sm:gap-5"
+          className="mt-6 flex flex-wrap gap-2"
+          role="tablist"
+          aria-label="Filter trending"
         >
-          {listings.map((listing, index) => (
-            <motion.div
-              key={listing.id}
-              initial={{ opacity: 0, y: 16 }}
-              animate={inView ? { opacity: 1, y: 0 } : undefined}
-              transition={{
-                duration: 0.4,
-                delay: Math.min(index * 0.06, 0.3),
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className="w-[min(100%,300px)] shrink-0 snap-start sm:w-[320px]"
-            >
-              <ListingCard listing={listing} />
-            </motion.div>
-          ))}
+          {FILTERS.map((item) => {
+            const active = filter === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setFilter(item.id)}
+                className={`inline-flex min-h-[36px] items-center rounded-full px-3.5 text-[13px] font-medium transition ${
+                  active
+                    ? "bg-slate-950 text-white"
+                    : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+                }`}
+              >
+                {item.label}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Desktop grid alternative for larger sets — show as grid from md when few cards */}
-        <div className="mt-4 sm:hidden">
-          <Link
-            href="/directory?featured=1"
-            className="text-[13px] font-medium text-teal-700"
+        {isLoading ? (
+          <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <ListingCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            layout
+            className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3"
           >
-            View all featured →
-          </Link>
-        </div>
+            {sorted.map((listing) => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+          </motion.div>
+        )}
+
+        {!showCarouselControls ? null : (
+          <p className="mt-6 text-center text-[13px] text-slate-500">
+            Jelajahi lebih banyak di{" "}
+            <Link href="/cari" className="font-medium text-gray-800 hover:text-gray-950">
+              halaman pencarian
+            </Link>
+            .
+          </p>
+        )}
       </div>
     </section>
   );

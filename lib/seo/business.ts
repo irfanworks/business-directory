@@ -27,7 +27,7 @@ export function buildLocalBusinessJsonLd(
     name: business.title,
     description,
     url: pageUrl,
-    image: business.logo_url || business.banner_url || undefined,
+    image: business.logo_url || undefined,
     telephone: business.phone || business.whatsapp || undefined,
     email: business.email || undefined,
     address: business.address

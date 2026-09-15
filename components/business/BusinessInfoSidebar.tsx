@@ -1,5 +1,6 @@
-import { Mail, MapPin, Phone } from "lucide-react";
+import { ExternalLink, Mail, MapPin, Phone } from "lucide-react";
 import { socialIcons } from "@/components/business/SocialIcons";
+import { getBusinessMapDisplay } from "@/lib/maps";
 import type { BusinessListing } from "@/lib/types";
 
 type BusinessInfoSidebarProps = {
@@ -18,41 +19,49 @@ export default function BusinessInfoSidebar({
     { key: "tiktok" as const, href: business.tiktok, label: "TikTok" },
   ].filter((s) => Boolean(s.href));
 
+  const { embedUrl, openUrl } = getBusinessMapDisplay({
+    maps_url: business.maps_url,
+    map_iframe_url: business.map_iframe_url,
+    address: business.address,
+    city: business.city,
+  });
+
   const hasAddress = Boolean(business.address || business.city);
   const hasContact = Boolean(
     business.phone || business.whatsapp || business.email,
   );
-  const hasMap = Boolean(business.map_iframe_url);
+  const hasMap = Boolean(embedUrl);
+  const hasOpenMaps = Boolean(openUrl);
   const hasSocials = socials.length > 0;
 
-  if (!hasAddress && !hasContact && !hasMap && !hasSocials) {
+  if (!hasAddress && !hasContact && !hasMap && !hasOpenMaps && !hasSocials) {
     return null;
   }
 
   return (
     <aside className="space-y-4 lg:sticky lg:top-24">
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
-        <h2 className="text-[12px] font-semibold uppercase tracking-[0.12em] text-slate-500">
-          Business Info
+      <div className="rounded-card border border-border bg-white p-5 shadow-card">
+        <h2 className="text-small uppercase tracking-[0.12em] text-ink-500">
+          Informasi bisnis
         </h2>
 
         {hasAddress && (
           <div className="mt-4">
-            <p className="inline-flex items-center gap-1.5 text-[12px] font-medium text-slate-500">
+            <p className="inline-flex items-center gap-1.5 text-[12px] font-medium text-ink-500">
               <MapPin className="h-3.5 w-3.5" />
-              Address
+              Lokasi
             </p>
-            <p className="mt-1.5 text-[13px] leading-relaxed text-slate-800">
+            <p className="mt-1.5 text-[13px] leading-relaxed text-ink-900">
               {[business.address, business.city].filter(Boolean).join(", ")}
             </p>
           </div>
         )}
 
-        {hasMap && business.map_iframe_url && (
-          <div className="mt-4 overflow-hidden rounded-xl border border-slate-200">
+        {hasMap && embedUrl && (
+          <div className="mt-4 overflow-hidden rounded-btn border border-border">
             <iframe
-              src={business.map_iframe_url}
-              title={`Map of ${business.title}`}
+              src={embedUrl}
+              title={`Peta ${business.title}`}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               className="h-48 w-full border-0"
@@ -61,23 +70,37 @@ export default function BusinessInfoSidebar({
           </div>
         )}
 
+        {hasOpenMaps && openUrl && (
+          <a
+            href={openUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`inline-flex items-center gap-1.5 text-[12px] font-medium text-accent transition hover:text-accent/80 ${
+              hasMap ? "mt-2" : "mt-4"
+            }`}
+          >
+            Buka di Google Maps
+            <ExternalLink className="h-3 w-3" />
+          </a>
+        )}
+
         {hasContact && (
           <div
             className={
-              hasAddress || hasMap
-                ? "mt-5 border-t border-slate-100 pt-5"
+              hasAddress || hasMap || hasOpenMaps
+                ? "mt-5 border-t border-border pt-5"
                 : "mt-4"
             }
           >
-            <p className="text-[12px] font-medium text-slate-500">Contact</p>
+            <p className="text-[12px] font-medium text-ink-500">Kontak</p>
             <ul className="mt-2.5 space-y-2.5">
               {business.phone && (
                 <li>
                   <a
                     href={`tel:${business.phone}`}
-                    className="inline-flex items-center gap-2 text-[13px] text-slate-700 transition hover:text-teal-700"
+                    className="inline-flex items-center gap-2 text-[13px] text-ink-700 transition hover:text-accent"
                   >
-                    <Phone className="h-3.5 w-3.5 text-slate-400" />
+                    <Phone className="h-3.5 w-3.5 text-ink-500" />
                     {business.phone}
                   </a>
                 </li>
@@ -88,9 +111,9 @@ export default function BusinessInfoSidebar({
                     href={`https://wa.me/${business.whatsapp.replace(/\D/g, "")}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-[13px] text-slate-700 transition hover:text-teal-700"
+                    className="inline-flex items-center gap-2 text-[13px] text-ink-700 transition hover:text-accent"
                   >
-                    <Phone className="h-3.5 w-3.5 text-emerald-500" />
+                    <Phone className="h-3.5 w-3.5 text-accent" />
                     WhatsApp {business.whatsapp}
                   </a>
                 </li>
@@ -99,9 +122,9 @@ export default function BusinessInfoSidebar({
                 <li>
                   <a
                     href={`mailto:${business.email}`}
-                    className="inline-flex items-center gap-2 text-[13px] text-slate-700 transition hover:text-teal-700"
+                    className="inline-flex items-center gap-2 text-[13px] text-ink-700 transition hover:text-accent"
                   >
-                    <Mail className="h-3.5 w-3.5 text-slate-400" />
+                    <Mail className="h-3.5 w-3.5 text-ink-500" />
                     {business.email}
                   </a>
                 </li>
@@ -113,13 +136,13 @@ export default function BusinessInfoSidebar({
         {hasSocials && (
           <div
             className={
-              hasAddress || hasMap || hasContact
-                ? "mt-5 border-t border-slate-100 pt-5"
+              hasAddress || hasMap || hasOpenMaps || hasContact
+                ? "mt-5 border-t border-border pt-5"
                 : "mt-4"
             }
           >
-            <p className="text-[12px] font-medium text-slate-500">
-              Social media
+            <p className="text-[12px] font-medium text-ink-500">
+              Media sosial
             </p>
             <ul className="mt-3 flex flex-wrap gap-2">
               {socials.map(({ key, href, label }) => {
@@ -132,7 +155,7 @@ export default function BusinessInfoSidebar({
                       rel="noopener noreferrer"
                       aria-label={label}
                       title={label}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 transition hover:border-teal-300 hover:bg-teal-50 hover:text-teal-800"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-btn border border-border bg-surface-soft text-ink-700 transition duration-150 hover:border-border-strong hover:text-ink-950"
                     >
                       <Icon className="h-4 w-4" />
                     </a>

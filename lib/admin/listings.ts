@@ -7,7 +7,6 @@ export type ListingFormValues = {
   short_tagline: string;
   content: string;
   logo_url: string;
-  banner_url: string;
   category_id: string;
   subcategory_id: string;
   status: ListingStatus;
@@ -16,6 +15,7 @@ export type ListingFormValues = {
   verified_badge: boolean;
   address: string;
   city: string;
+  maps_url: string;
   map_iframe_url: string;
   phone: string;
   whatsapp: string;
@@ -56,7 +56,6 @@ export const emptyListingForm = (): ListingFormValues => ({
   short_tagline: "",
   content: "",
   logo_url: "",
-  banner_url: "",
   category_id: "",
   subcategory_id: "",
   status: "draft",
@@ -65,6 +64,7 @@ export const emptyListingForm = (): ListingFormValues => ({
   verified_badge: false,
   address: "",
   city: "",
+  maps_url: "",
   map_iframe_url: "",
   phone: "",
   whatsapp: "",

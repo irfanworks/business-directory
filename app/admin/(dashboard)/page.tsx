@@ -121,7 +121,7 @@ export default async function AdminDashboardPage() {
           href="/admin/settings"
           icon={Settings2}
           title="Site Settings"
-          description="Atur banner, title, dan hero text homepage."
+          description="Atur konten homepage, SEO, kontak, dan social."
         />
       </div>
 

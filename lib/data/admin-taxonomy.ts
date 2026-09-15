@@ -1,9 +1,4 @@
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
-import {
-  DEFAULT_SETTINGS,
-  SETTINGS_FIELDS,
-  type SettingsMap,
-} from "@/lib/admin/settings";
 
 export type AdminCategory = {
   id: string;
@@ -93,30 +88,4 @@ export async function getAdminCategoriesTree(): Promise<AdminCategory[]> {
         a.name.localeCompare(b.name, "id"),
       ),
   }));
-}
-
-export async function getAdminSiteSettings(): Promise<SettingsMap> {
-  const merged: SettingsMap = { ...DEFAULT_SETTINGS };
-
-  if (!isSupabaseConfigured()) return merged;
-
-  const supabase = createClient();
-  if (!supabase) return merged;
-
-  const { data, error } = await supabase
-    .from("site_settings")
-    .select("key, value");
-
-  if (error || !data) {
-    console.error("Admin settings fetch failed:", error?.message);
-    return merged;
-  }
-
-  for (const row of data) {
-    if (SETTINGS_FIELDS.some((f) => f.key === row.key)) {
-      merged[row.key] = row.value ?? "";
-    }
-  }
-
-  return merged;
 }

@@ -9,6 +9,7 @@ import {
   type ListingStatus,
   type ListingTier,
 } from "@/lib/admin/listings";
+import { resolveListingMaps } from "@/lib/maps";
 
 export type ListingActionResult =
   | { ok: true; id: string; slug: string }
@@ -18,7 +19,9 @@ type ParsedListingPayload =
   | { ok: false; error: string }
   | { ok: true; data: Record<string, unknown>; slug: string };
 
-function parsePayload(raw: ListingFormValues): ParsedListingPayload {
+async function parsePayload(
+  raw: ListingFormValues,
+): Promise<ParsedListingPayload> {
   const title = raw.title.trim();
   const slug = (raw.slug.trim() || slugify(title)).trim();
   const subcategoryId = raw.subcategory_id.trim();
@@ -32,6 +35,12 @@ function parsePayload(raw: ListingFormValues): ParsedListingPayload {
   const status = raw.status as ListingStatus;
   const tier = raw.tier as ListingTier;
 
+  const maps = await resolveListingMaps({
+    mapsUrl: raw.maps_url,
+    address: raw.address,
+    city: raw.city,
+  });
+
   return {
     ok: true,
     slug,
@@ -41,7 +50,6 @@ function parsePayload(raw: ListingFormValues): ParsedListingPayload {
       short_tagline: nullIfEmpty(raw.short_tagline),
       content: nullIfEmpty(raw.content),
       logo_url: nullIfEmpty(raw.logo_url),
-      banner_url: nullIfEmpty(raw.banner_url),
       subcategory_id: subcategoryId,
       status,
       tier,
@@ -49,7 +57,8 @@ function parsePayload(raw: ListingFormValues): ParsedListingPayload {
       verified_badge: Boolean(raw.verified_badge),
       address: nullIfEmpty(raw.address),
       city: nullIfEmpty(raw.city),
-      map_iframe_url: nullIfEmpty(raw.map_iframe_url),
+      maps_url: maps.maps_url,
+      map_iframe_url: maps.map_iframe_url,
       phone: nullIfEmpty(raw.phone),
       whatsapp: nullIfEmpty(raw.whatsapp),
       email: nullIfEmpty(raw.email),
@@ -86,7 +95,7 @@ export async function createListing(
     return { ok: false, error: "Gagal membuat Supabase client." };
   }
 
-  const parsed = parsePayload(values);
+  const parsed = await parsePayload(values);
   if (!parsed.ok) return parsed;
 
   const { data, error } = await supabase
@@ -119,7 +128,7 @@ export async function updateListing(
     return { ok: false, error: "Gagal membuat Supabase client." };
   }
 
-  const parsed = parsePayload(values);
+  const parsed = await parsePayload(values);
   if (!parsed.ok) return parsed;
 
   const { data, error } = await supabase

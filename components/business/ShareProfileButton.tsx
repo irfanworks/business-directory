@@ -6,11 +6,13 @@ import { Check, Share2 } from "lucide-react";
 type ShareProfileButtonProps = {
   title: string;
   url: string;
+  compact?: boolean;
 };
 
 export default function ShareProfileButton({
   title,
   url,
+  compact = false,
 }: ShareProfileButtonProps) {
   const [copied, setCopied] = useState(false);
 
@@ -37,17 +39,21 @@ export default function ShareProfileButton({
     <button
       type="button"
       onClick={handleShare}
-      className="inline-flex h-10 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 text-[13px] font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+      className={
+        compact
+          ? "inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 text-[12px] font-semibold text-red-950 transition hover:bg-red-50"
+          : "inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-red-200 bg-white px-4 text-[13px] font-semibold text-red-950 transition hover:bg-red-50"
+      }
     >
       {copied ? (
         <>
-          <Check className="h-3.5 w-3.5 text-teal-600" />
-          Copied
+          <Check className={compact ? "h-3.5 w-3.5 text-accent" : "h-3.5 w-3.5 text-accent"} />
+          Tersalin
         </>
       ) : (
         <>
           <Share2 className="h-3.5 w-3.5" />
-          Share Profile
+          Bagikan
         </>
       )}
     </button>
