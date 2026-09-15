@@ -4,6 +4,7 @@ import { createHash } from "crypto";
 import { headers } from "next/headers";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getSiteSettings } from "@/lib/data/site-settings";
+import { getSiteUrl } from "@/lib/seo/site";
 
 export type CorrectionIssueType =
   | "alamat"
@@ -89,9 +90,7 @@ async function notifyEmail(input: {
     process.env.CONTACT_FROM_EMAIL?.trim() ||
     "Optisio Directory <onboarding@resend.dev>";
 
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-    "http://localhost:3000";
+  const siteUrl = getSiteUrl();
   const pageUrl = `${siteUrl}/business/${input.listingSlug}`;
 
   try {

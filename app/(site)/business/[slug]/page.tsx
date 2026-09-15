@@ -12,17 +12,11 @@ import ReportIncorrectInfo from "@/components/business/ReportIncorrectInfo";
 import { getBusinessBySlug } from "@/lib/data/business";
 import { getRelatedBusinesses } from "@/lib/data/directory";
 import { buildLocalBusinessJsonLd } from "@/lib/seo/business";
+import { getSiteUrl } from "@/lib/seo/site";
 
 type PageProps = {
   params: { slug: string };
 };
-
-function siteOrigin() {
-  return (
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-    "http://localhost:3000"
-  );
-}
 
 export async function generateMetadata({
   params,
@@ -37,7 +31,7 @@ export async function generateMetadata({
     ? `${tagline} Cari tahu lebih dalam tentang ${business.title}.`
     : `Cari tahu lebih dalam tentang ${business.title}.`;
 
-  const pageUrl = `${siteOrigin()}/business/${business.slug}`;
+  const pageUrl = `${getSiteUrl()}/business/${business.slug}`;
   const image = business.logo_url || undefined;
   // Root layout already applies `%s | {siteName}` — pass business name only.
   const title = business.title;
@@ -69,7 +63,7 @@ export default async function BusinessDetailPage({ params }: PageProps) {
   const business = await getBusinessBySlug(params.slug);
   if (!business) notFound();
 
-  const pageUrl = `${siteOrigin()}/business/${business.slug}`;
+  const pageUrl = `${getSiteUrl()}/business/${business.slug}`;
   const jsonLd = buildLocalBusinessJsonLd(business, pageUrl);
   const related = await getRelatedBusinesses(
     business.category_slug,

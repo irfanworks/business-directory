@@ -114,7 +114,7 @@ export default function Navbar({ adminBar = false }: { adminBar?: boolean }) {
       <div className="pointer-events-auto mx-auto max-w-7xl">
         <header
           className={[
-            "relative overflow-hidden rounded-3xl border border-red-200/40",
+            "relative rounded-3xl border border-red-200/40",
             "bg-white/80 backdrop-blur-xl saturate-150",
             "shadow-[0_8px_32px_rgba(127,29,29,0.12),0_0_40px_rgba(220,38,38,0.08),inset_0_1px_0_rgba(255,255,255,0.9)]",
             "transition-all duration-300",
@@ -123,11 +123,11 @@ export default function Navbar({ adminBar = false }: { adminBar?: boolean }) {
         >
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/90 to-transparent"
+            className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl bg-gradient-to-b from-white/90 to-transparent"
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 bg-white/40"
+            className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl bg-white/40"
           />
 
           <div className="relative z-10 grid h-16 grid-cols-[1fr_auto] items-center gap-4 px-4 sm:px-6 lg:grid-cols-[1fr_auto_1fr]">
@@ -138,7 +138,7 @@ export default function Navbar({ adminBar = false }: { adminBar?: boolean }) {
             />
 
             <nav
-              className="hidden items-center justify-center gap-1 lg:flex"
+              className="relative z-20 hidden items-center justify-center gap-1 lg:flex"
               aria-label="Navigasi utama"
             >
               {NAV_LINKS.map((link) => {
@@ -167,7 +167,7 @@ export default function Navbar({ adminBar = false }: { adminBar?: boolean }) {
                 );
               })}
 
-              <div ref={layananRef} className="relative">
+              <div ref={layananRef} className="relative z-30">
                 <button
                   type="button"
                   aria-expanded={layananOpen}
@@ -188,7 +188,7 @@ export default function Navbar({ adminBar = false }: { adminBar?: boolean }) {
                   <div
                     role="menu"
                     aria-label="Layanan Optisio"
-                    className="absolute left-1/2 top-full z-20 mt-2 w-72 -translate-x-1/2 overflow-hidden rounded-2xl border border-black/8 bg-white py-2 shadow-[0_12px_40px_rgba(15,23,42,0.12)]"
+                    className="absolute left-1/2 top-full z-[100] mt-2 w-72 -translate-x-1/2 overflow-hidden rounded-2xl border border-black/8 bg-white py-2 shadow-[0_12px_40px_rgba(15,23,42,0.18)]"
                   >
                     {LAYANAN_LINKS.map((item) => (
                       <a
