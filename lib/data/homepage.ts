@@ -266,7 +266,8 @@ export async function getFeaturedListings(): Promise<FeaturedListing[]> {
       subcategories (
         name,
         categories ( name, slug )
-      )
+      ),
+      categories ( name, slug )
     `,
     )
     .eq("status", "published")
@@ -297,6 +298,10 @@ function mapFeaturedRow(row: {
   created_at?: string | null;
   updated_at?: string | null;
   whatsapp?: string | null;
+  categories:
+    | { name: string; slug: string }
+    | { name: string; slug: string }[]
+    | null;
   subcategories:
     | {
         name: string;
@@ -309,7 +314,8 @@ function mapFeaturedRow(row: {
     | null;
 }): FeaturedListing {
   const subcategory = unwrapOne(row.subcategories);
-  const category = unwrapOne(subcategory?.categories);
+  const category =
+    unwrapOne(row.categories) ?? unwrapOne(subcategory?.categories);
 
   return {
     id: row.id,
@@ -360,7 +366,8 @@ export async function getRecentlyVerifiedListings(): Promise<FeaturedListing[]> 
       subcategories (
         name,
         categories ( name, slug )
-      )
+      ),
+      categories ( name, slug )
     `,
     )
     .eq("status", "published")

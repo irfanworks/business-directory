@@ -24,12 +24,13 @@ async function parsePayload(
 ): Promise<ParsedListingPayload> {
   const title = raw.title.trim();
   const slug = (raw.slug.trim() || slugify(title)).trim();
+  const categoryId = raw.category_id.trim();
   const subcategoryId = raw.subcategory_id.trim();
 
   if (!title) return { ok: false, error: "Nama bisnis wajib diisi." };
   if (!slug) return { ok: false, error: "Slug wajib diisi." };
-  if (!subcategoryId) {
-    return { ok: false, error: "Subkategori wajib dipilih." };
+  if (!categoryId) {
+    return { ok: false, error: "Kategori wajib dipilih." };
   }
 
   const status = raw.status as ListingStatus;
@@ -50,7 +51,8 @@ async function parsePayload(
       short_tagline: nullIfEmpty(raw.short_tagline),
       content: nullIfEmpty(raw.content),
       logo_url: nullIfEmpty(raw.logo_url),
-      subcategory_id: subcategoryId,
+      category_id: categoryId,
+      subcategory_id: subcategoryId || null,
       status,
       tier,
       is_featured: Boolean(raw.is_featured),

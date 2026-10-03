@@ -137,6 +137,10 @@ function mapListingRow(row: {
   view_count?: number | null;
   created_at?: string | null;
   updated_at?: string | null;
+  categories:
+    | { name: string; slug: string }
+    | { name: string; slug: string }[]
+    | null;
   subcategories:
     | {
         name: string;
@@ -151,7 +155,8 @@ function mapListingRow(row: {
     | null;
 }): DirectoryListing {
   const subcategory = unwrapOne(row.subcategories);
-  const category = unwrapOne(subcategory?.categories);
+  const category =
+    unwrapOne(row.categories) ?? unwrapOne(subcategory?.categories);
 
   return {
     id: row.id,
@@ -190,6 +195,10 @@ const LISTING_SELECT = `
     name,
     slug,
     categories ( name, slug )
+  ),
+  categories (
+    name,
+    slug
   )
 `;
 
@@ -259,14 +268,13 @@ export async function getSubcategoryBySlug(
 export async function getPublishedListingsForSubcategoryIds(
   subcategoryIds: string[],
   categorySlug: string,
+  categoryId?: string,
 ): Promise<DirectoryListing[]> {
   if (!isSupabaseConfigured()) {
     return sortListingsByPriority(
       FALLBACK_LISTINGS.filter((l) => l.category_slug === categorySlug),
     );
   }
-
-  if (!subcategoryIds.length) return [];
 
   const supabase = createClient();
   if (!supabase) {
@@ -275,11 +283,21 @@ export async function getPublishedListingsForSubcategoryIds(
     );
   }
 
+  const orFilter = categoryId
+    ? subcategoryIds.length
+      ? `category_id.eq.${categoryId},subcategory_id.in.(${subcategoryIds.join(",")})`
+      : `category_id.eq.${categoryId}`
+    : subcategoryIds.length
+      ? `subcategory_id.in.(${subcategoryIds.join(",")})`
+      : null;
+
+  if (!orFilter) return [];
+
   const { data, error } = await supabase
     .from("listings")
     .select(LISTING_SELECT)
     .eq("status", "published")
-    .in("subcategory_id", subcategoryIds);
+    .or(orFilter);
 
   if (error || !data) {
     console.error("Failed to load listings by subcategory ids:", error?.message);

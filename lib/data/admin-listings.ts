@@ -82,7 +82,8 @@ export async function getAdminListings(): Promise<AdminListingTableRow[]> {
       subcategories (
         name,
         categories ( name )
-      )
+      ),
+      categories ( name )
     `,
     )
     .order("created_at", { ascending: false });
@@ -94,7 +95,8 @@ export async function getAdminListings(): Promise<AdminListingTableRow[]> {
 
   return data.map((row) => {
     const subcategory = unwrapOne(row.subcategories);
-    const category = unwrapOne(subcategory?.categories);
+    const category =
+      unwrapOne(row.categories) ?? unwrapOne(subcategory?.categories);
     return {
       id: row.id,
       title: row.title,
@@ -241,6 +243,7 @@ export async function getAdminListingForm(
       youtube,
       twitter,
       tiktok,
+      category_id,
       subcategory_id,
       subcategories ( category_id )
     `,
@@ -263,7 +266,7 @@ export async function getAdminListingForm(
       short_tagline: data.short_tagline || "",
       content: data.content || "",
       logo_url: data.logo_url || "",
-      category_id: subcategory?.category_id || "",
+      category_id: data.category_id || subcategory?.category_id || "",
       subcategory_id: data.subcategory_id || "",
       status: data.status,
       tier: data.tier,

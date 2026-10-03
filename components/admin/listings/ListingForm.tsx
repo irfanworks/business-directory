@@ -147,18 +147,19 @@ export default function ListingForm({
           </Field>
 
           <Field
-            label="Subkategori *"
+            label="Subkategori"
             hint={
               values.category_id && subcategories.length === 0
-                ? "Kategori ini belum punya subkategori. Tambahkan dulu di menu Categories."
-                : undefined
+                ? "Opsional. Kategori ini belum punya subkategori — listing tetap bisa disimpan."
+                : "Opsional. Boleh dikosongkan."
             }
           >
             <AdminSelect
-              required
               value={values.subcategory_id}
-              placeholder="Pilih subkategori"
+              placeholder="Tanpa subkategori"
               disabled={!values.category_id}
+              allowEmpty
+              emptyChoiceLabel="Tanpa subkategori"
               emptyLabel={
                 values.category_id
                   ? "Tidak ada subkategori"
@@ -393,6 +394,8 @@ function AdminSelect({
   placeholder,
   disabled,
   required,
+  allowEmpty,
+  emptyChoiceLabel = "Tidak dipilih",
   emptyLabel = "Tidak ada pilihan",
 }: {
   value: string;
@@ -401,6 +404,8 @@ function AdminSelect({
   placeholder: string;
   disabled?: boolean;
   required?: boolean;
+  allowEmpty?: boolean;
+  emptyChoiceLabel?: string;
   emptyLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -450,6 +455,24 @@ function AdminSelect({
           role="listbox"
           className="absolute left-0 right-0 z-[80] mt-1 max-h-60 overflow-y-auto rounded-xl border border-slate-200 bg-white py-1 shadow-[0_12px_40px_rgba(15,23,42,0.16)]"
         >
+          {allowEmpty ? (
+            <li>
+              <button
+                type="button"
+                role="option"
+                aria-selected={!value}
+                className={`w-full px-3 py-2.5 text-left text-[13px] transition hover:bg-slate-50 ${
+                  !value ? "font-semibold text-slate-950" : "text-slate-500"
+                }`}
+                onClick={() => {
+                  onChange("");
+                  setOpen(false);
+                }}
+              >
+                {emptyChoiceLabel}
+              </button>
+            </li>
+          ) : null}
           {options.length === 0 ? (
             <li className="px-3 py-2.5 text-[13px] text-slate-500">
               {emptyLabel}

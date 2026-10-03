@@ -34,6 +34,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   const listings = await getPublishedListingsForSubcategoryIds(
     subcategories.map((s) => s.id),
     category.slug,
+    category.id,
   );
 
   return (

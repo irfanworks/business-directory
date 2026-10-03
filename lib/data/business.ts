@@ -97,6 +97,10 @@ function mapBusinessRow(row: {
   is_featured: boolean;
   tier: BusinessListing["tier"];
   view_count: number;
+  categories:
+    | { name: string; slug: string }
+    | { name: string; slug: string }[]
+    | null;
   subcategories:
     | {
         name: string;
@@ -117,7 +121,8 @@ function mapBusinessRow(row: {
     | null;
 }): BusinessListing {
   const subcategory = unwrapOne(row.subcategories);
-  const category = unwrapOne(subcategory?.categories);
+  const category =
+    unwrapOne(row.categories) ?? unwrapOne(subcategory?.categories);
 
   return {
     id: row.id,
@@ -195,7 +200,8 @@ export async function getBusinessBySlug(
         name,
         slug,
         categories ( name, slug )
-      )
+      ),
+      categories ( name, slug )
     `,
     )
     .eq("slug", slug)

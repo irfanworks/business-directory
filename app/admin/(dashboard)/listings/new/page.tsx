@@ -14,7 +14,6 @@ export default async function AdminNewListingPage() {
   const initial = emptyListingForm();
   if (categories[0]) {
     initial.category_id = categories[0].id;
-    initial.subcategory_id = categories[0].subcategories[0]?.id || "";
   }
 
   return (
