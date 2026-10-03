@@ -1,7 +1,15 @@
 "use client";
 
-import { useMemo, useState, useTransition, type FormEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+  type FormEvent,
+} from "react";
 import { useRouter } from "next/navigation";
+import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import {
   createListing,
@@ -34,7 +42,8 @@ export default function ListingForm({
   const [isPending, startTransition] = useTransition();
 
   const subcategories = useMemo(() => {
-    const category = categories.find((c) => c.id === values.category_id);
+    const selectedId = String(values.category_id || "");
+    const category = categories.find((c) => String(c.id) === selectedId);
     return category?.subcategories ?? [];
   }, [categories, values.category_id]);
 
@@ -87,11 +96,11 @@ export default function ListingForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
-      <section className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.03)] sm:p-6">
+      <section className="relative overflow-visible rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.03)] sm:p-6">
         <h2 className="text-[13px] font-semibold uppercase tracking-[0.1em] text-slate-500">
           Basic info
         </h2>
-        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="mt-4 grid grid-cols-1 gap-4 overflow-visible md:grid-cols-2">
           <Field label="Nama resmi bisnis *" className="md:col-span-2">
             <input
               required
@@ -125,36 +134,42 @@ export default function ListingForm({
           </Field>
 
           <Field label="Kategori *">
-            <select
+            <AdminSelect
               required
               value={values.category_id}
-              onChange={(e) => onCategoryChange(e.target.value)}
-              className={inputClass}
-            >
-              <option value="">Pilih kategori</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+              placeholder="Pilih kategori"
+              options={categories.map((cat) => ({
+                value: cat.id,
+                label: cat.name,
+              }))}
+              onChange={onCategoryChange}
+            />
           </Field>
 
-          <Field label="Subkategori *">
-            <select
+          <Field
+            label="Subkategori *"
+            hint={
+              values.category_id && subcategories.length === 0
+                ? "Kategori ini belum punya subkategori. Tambahkan dulu di menu Categories."
+                : undefined
+            }
+          >
+            <AdminSelect
               required
               value={values.subcategory_id}
-              onChange={(e) => patch("subcategory_id", e.target.value)}
-              className={inputClass}
+              placeholder="Pilih subkategori"
               disabled={!values.category_id}
-            >
-              <option value="">Pilih subkategori</option>
-              {subcategories.map((sub) => (
-                <option key={sub.id} value={sub.id}>
-                  {sub.name}
-                </option>
-              ))}
-            </select>
+              emptyLabel={
+                values.category_id
+                  ? "Tidak ada subkategori"
+                  : "Pilih kategori dulu"
+              }
+              options={subcategories.map((sub) => ({
+                value: sub.id,
+                label: sub.name,
+              }))}
+              onChange={(id) => patch("subcategory_id", id)}
+            />
           </Field>
 
           <Field label="Status">
@@ -355,7 +370,7 @@ function Field({
   hint?: string;
 }) {
   return (
-    <label className={`block ${className}`}>
+    <div className={`block ${className}`}>
       <span className="mb-1.5 block text-[12px] font-medium text-slate-700">
         {label}
       </span>
@@ -365,7 +380,108 @@ function Field({
           {hint}
         </span>
       ) : null}
-    </label>
+    </div>
+  );
+}
+
+type AdminSelectOption = { value: string; label: string };
+
+function AdminSelect({
+  value,
+  options,
+  onChange,
+  placeholder,
+  disabled,
+  required,
+  emptyLabel = "Tidak ada pilihan",
+}: {
+  value: string;
+  options: AdminSelectOption[];
+  onChange: (value: string) => void;
+  placeholder: string;
+  disabled?: boolean;
+  required?: boolean;
+  emptyLabel?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const selected = options.find((opt) => String(opt.value) === String(value));
+
+  useEffect(() => {
+    function onPointerDown(e: MouseEvent) {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+
+  return (
+    <div ref={rootRef} className={`relative ${open ? "z-30" : "z-10"}`}>
+      <input type="hidden" value={value} required={required && !disabled} />
+      <button
+        type="button"
+        disabled={disabled}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className={`${inputClass} flex items-center justify-between gap-2 text-left`}
+      >
+        <span className={selected ? "truncate" : "truncate text-slate-400"}>
+          {selected?.label || placeholder}
+        </span>
+        <ChevronDown
+          className={`h-4 w-4 shrink-0 text-slate-400 transition ${
+            open ? "rotate-180" : ""
+          }`}
+          aria-hidden
+        />
+      </button>
+      {open && !disabled ? (
+        <ul
+          role="listbox"
+          className="absolute left-0 right-0 z-[80] mt-1 max-h-60 overflow-y-auto rounded-xl border border-slate-200 bg-white py-1 shadow-[0_12px_40px_rgba(15,23,42,0.16)]"
+        >
+          {options.length === 0 ? (
+            <li className="px-3 py-2.5 text-[13px] text-slate-500">
+              {emptyLabel}
+            </li>
+          ) : (
+            options.map((opt) => {
+              const active = String(opt.value) === String(value);
+              return (
+                <li key={opt.value}>
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={active}
+                    className={`w-full px-3 py-2.5 text-left text-[13px] transition hover:bg-slate-50 ${
+                      active
+                        ? "font-semibold text-slate-950"
+                        : "text-slate-700"
+                    }`}
+                    onClick={() => {
+                      onChange(opt.value);
+                      setOpen(false);
+                    }}
+                  >
+                    {opt.label}
+                  </button>
+                </li>
+              );
+            })
+          )}
+        </ul>
+      ) : null}
+    </div>
   );
 }
 

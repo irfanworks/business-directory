@@ -111,40 +111,76 @@ export async function getAdminListings(): Promise<AdminListingTableRow[]> {
   });
 }
 
+const PAGE_SIZE = 1000;
+
+async function fetchAllRows<T>(
+  fetchPage: (from: number, to: number) => Promise<T[] | null>,
+): Promise<T[]> {
+  const rows: T[] = [];
+  let from = 0;
+  for (;;) {
+    const page = await fetchPage(from, from + PAGE_SIZE - 1);
+    if (!page?.length) break;
+    rows.push(...page);
+    if (page.length < PAGE_SIZE) break;
+    from += PAGE_SIZE;
+  }
+  return rows;
+}
+
 export async function getAdminCategories(): Promise<CategoryOption[]> {
   if (!isSupabaseConfigured()) return FALLBACK_CATEGORIES;
 
   const supabase = createClient();
   if (!supabase) return FALLBACK_CATEGORIES;
 
-  const { data, error } = await supabase
-    .from("categories")
-    .select(
-      `
-      id,
-      name,
-      slug,
-      subcategories ( id, name, slug )
-    `,
-    )
-    .order("name", { ascending: true });
+  const [categoryRows, subcategoryRows] = await Promise.all([
+    fetchAllRows(async (from, to) => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("id, name, slug")
+        .order("name", { ascending: true })
+        .range(from, to);
+      if (error) {
+        console.error("Admin categories fetch failed:", error.message);
+        return null;
+      }
+      return data;
+    }),
+    fetchAllRows(async (from, to) => {
+      const { data, error } = await supabase
+        .from("subcategories")
+        .select("id, category_id, name, slug")
+        .order("name", { ascending: true })
+        .range(from, to);
+      if (error) {
+        console.error("Admin subcategories fetch failed:", error.message);
+        return null;
+      }
+      return data;
+    }),
+  ]);
 
-  if (error || !data?.length) {
-    console.error("Admin categories fetch failed:", error?.message);
+  if (!categoryRows.length) {
     return FALLBACK_CATEGORIES;
   }
 
-  return data.map((row) => ({
-    id: row.id,
+  const byCategory = new Map<
+    string,
+    { id: string; name: string; slug: string }[]
+  >();
+  for (const sub of subcategoryRows) {
+    const key = String(sub.category_id);
+    const list = byCategory.get(key) ?? [];
+    list.push({ id: String(sub.id), name: sub.name, slug: sub.slug });
+    byCategory.set(key, list);
+  }
+
+  return categoryRows.map((row) => ({
+    id: String(row.id),
     name: row.name,
     slug: row.slug,
-    subcategories: (row.subcategories ?? []).map(
-      (sub: { id: string; name: string; slug: string }) => ({
-        id: sub.id,
-        name: sub.name,
-        slug: sub.slug,
-      }),
-    ),
+    subcategories: byCategory.get(String(row.id)) ?? [],
   }));
 }
 

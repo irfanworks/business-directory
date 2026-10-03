@@ -45,47 +45,53 @@ export async function getAdminCategoriesTree(): Promise<AdminCategory[]> {
   const supabase = createClient();
   if (!supabase) return FALLBACK_CATEGORIES;
 
-  const { data, error } = await supabase
-    .from("categories")
-    .select(
-      `
-      id,
-      name,
-      slug,
-      description,
-      icon_name,
-      subcategories ( id, name, slug, description )
-    `,
-    )
-    .order("name", { ascending: true });
+  const PAGE_SIZE = 1000;
 
-  if (error || !data) {
-    console.error("Admin categories tree failed:", error?.message);
+  const [catRes, subRes] = await Promise.all([
+    supabase
+      .from("categories")
+      .select("id, name, slug, description, icon_name")
+      .order("name", { ascending: true }),
+    supabase
+      .from("subcategories")
+      .select("id, category_id, name, slug, description")
+      .order("name", { ascending: true })
+      .range(0, PAGE_SIZE - 1),
+  ]);
+
+  if (catRes.error || !catRes.data) {
+    console.error("Admin categories tree failed:", catRes.error?.message);
     return FALLBACK_CATEGORIES;
   }
 
-  return data.map((row) => ({
-    id: row.id,
+  if (subRes.error) {
+    console.error("Admin subcategories tree failed:", subRes.error.message);
+  }
+
+  const byCategory = new Map<
+    string,
+    AdminCategory["subcategories"]
+  >();
+  for (const sub of subRes.data ?? []) {
+    const key = String(sub.category_id);
+    const list = byCategory.get(key) ?? [];
+    list.push({
+      id: String(sub.id),
+      name: sub.name,
+      slug: sub.slug,
+      description: sub.description,
+    });
+    byCategory.set(key, list);
+  }
+
+  return catRes.data.map((row) => ({
+    id: String(row.id),
     name: row.name,
     slug: row.slug,
     description: row.description,
     icon_name: row.icon_name,
-    subcategories: (row.subcategories ?? [])
-      .map(
-        (sub: {
-          id: string;
-          name: string;
-          slug: string;
-          description: string | null;
-        }) => ({
-          id: sub.id,
-          name: sub.name,
-          slug: sub.slug,
-          description: sub.description,
-        }),
-      )
-      .sort((a: { name: string }, b: { name: string }) =>
-        a.name.localeCompare(b.name, "id"),
-      ),
+    subcategories: (byCategory.get(String(row.id)) ?? []).sort((a, b) =>
+      a.name.localeCompare(b.name, "id"),
+    ),
   }));
 }
